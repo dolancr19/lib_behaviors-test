@@ -148,12 +148,12 @@ IvPFunction* BHV_FrontSearch::onRunState()
   double temp = strtod(get_temp.c_str(),NULL);
   if(ok1)
     {
-      if(m_osx>150)
+      if(m_osx>130)
         {
           m_east=true;
           m_west=false;
         }
-      if(m_osx<-20)
+      if(m_osx<0)
         {
           m_west=true;
           m_east=false;
@@ -173,7 +173,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
       
       postMessage("DELTA_T2",temp-m_initial_temp);
 
-      if(temp-m_initial_temp>=2)
+      if(temp-m_initial_temp>=3)
         {
           m_warming=true;
           m_steady=false;
@@ -185,7 +185,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
           postMessage("STEADY1","false");
         }
 
-      else if(temp-m_initial_temp<=-2)
+      else if(temp-m_initial_temp<=-3)
         {
           m_cooling=true;
           m_steady=false;
@@ -200,10 +200,10 @@ IvPFunction* BHV_FrontSearch::onRunState()
       if(m_warming)
 	{
 	  postMessage("COUNTER",m_counter);
-	  if(m_counter>3)
+	  if(m_counter>6)
 	   {
               
-	      if(abs(temp-m_previous_temp<=.2))
+	      if(abs(temp-m_previous_temp<=.10))
                 {
 		  postMessage("DELTA_T",abs(temp-m_previous_temp));
                   if(m_west)
@@ -231,7 +231,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
 
       else if(m_cooling)
 	{
-	  if(m_counter>3)
+	  if(m_counter>6)
 	    {
 	      if(abs(temp-m_previous_temp<=.2))
                 {

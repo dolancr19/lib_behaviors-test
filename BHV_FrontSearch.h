@@ -50,6 +50,7 @@ protected: // State variables
   bool m_first_temp;
   bool m_west;
   bool m_east;
+  double m_angle;
 };
 
 #define IVP_EXPORT_FUNCTION

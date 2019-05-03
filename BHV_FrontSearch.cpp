@@ -30,6 +30,7 @@ BHV_FrontSearch::BHV_FrontSearch(IvPDomain domain) :
   string host = toupper(m_host_community);
   m_report = "UCTD_MSMNT_REPORT";
   addInfoVars(m_report);
+  addInfoVars("ANGLE");
 
   m_desired_course=180;
   m_initial_temp=0;
@@ -45,6 +46,7 @@ BHV_FrontSearch::BHV_FrontSearch(IvPDomain domain) :
   m_first_temp=true;
   m_west=true;
   m_east=false;
+  m_angle=0;
 }
 
 //---------------------------------------------------------------
@@ -139,21 +141,22 @@ IvPFunction* BHV_FrontSearch::onRunState()
   // Part 1: Build the IvP function
   IvPFunction *ipf = 0;
 
-  bool ok1, ok2, ok3, ok4;
+  bool ok1, ok2, ok3, ok4, ok5;
   m_osx=getBufferDoubleVal("NAV_X",ok1);
   m_osy=getBufferDoubleVal("NAV_Y",ok2);
   m_osh=getBufferDoubleVal("NAV_HEADING",ok3);
   string info = getBufferStringVal(m_report,ok4);
   string get_temp = tokStringParse(info,"temp",',','=');
   double temp = strtod(get_temp.c_str(),NULL);
+  m_angle=getBufferDoubleVal("ANGLE",ok5);
   if(ok1)
     {
-      if(m_osx>130)
+      if(m_osx>120)
         {
           m_east=true;
           m_west=false;
         }
-      if(m_osx<0)
+      if(m_osx<10)
         {
           m_west=true;
           m_east=false;
@@ -173,7 +176,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
       
       postMessage("DELTA_T2",temp-m_initial_temp);
 
-      if(temp-m_initial_temp>=3)
+      if(temp-m_initial_temp>=4)
         {
           m_warming=true;
           m_steady=false;
@@ -185,7 +188,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
           postMessage("STEADY1","false");
         }
 
-      else if(temp-m_initial_temp<=-3)
+      else if(temp-m_initial_temp<=-4)
         {
           m_cooling=true;
           m_steady=false;
@@ -200,16 +203,17 @@ IvPFunction* BHV_FrontSearch::onRunState()
       if(m_warming)
 	{
 	  postMessage("COUNTER",m_counter);
-	  if(m_counter>6)
+	  postMessage("DELTA_T",abs(temp-m_previous_temp));
+	  if(m_counter>10)
 	   {
               
-	      if(abs(temp-m_previous_temp<=.10))
+	      if(abs(temp-m_previous_temp<=.20))
                 {
-		  postMessage("DELTA_T",abs(temp-m_previous_temp));
+		  
                   if(m_west)
-                    m_desired_course=30;
+                    m_desired_course=m_angle+20;
                   else if(m_east)
-	            m_desired_course=330;
+	            m_desired_course=m_angle+340;
                   m_warming=false;
                   m_steady=false;
                   postMessage("WARMING","false");
@@ -222,6 +226,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
 	      else
 	        {
 		  m_counter=0;
+		  m_previous_temp=temp;
 		  m_desired_course=m_desired_course;
 	        }
 	       }
@@ -231,12 +236,16 @@ IvPFunction* BHV_FrontSearch::onRunState()
 
       else if(m_cooling)
 	{
-	  if(m_counter>6)
+	  if(m_counter>10)
 	    {
 	      if(abs(temp-m_previous_temp<=.2))
                 {
-                  m_desired_course=180;
-                  m_cooling=false;
+                  //m_desired_course=180;
+		  if(m_west)
+                    m_desired_course=m_angle+160;
+                  else if(m_east)
+	            m_desired_course=m_angle+200;
+		  m_cooling=false;
                   m_steady=false;
                   postMessage("COOLING","false");
                   m_initial_temp=temp;

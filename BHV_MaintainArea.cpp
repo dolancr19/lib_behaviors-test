@@ -133,7 +133,7 @@ IvPFunction* BHV_MaintainArea::onRunState()
 
   if(m_eta<4)
     {
-      m_priority_wt=100;
+      m_priority_wt=150;
       double desired_course=m_osh+180;
       ipf = GetCourse(desired_course);
       return(ipf);

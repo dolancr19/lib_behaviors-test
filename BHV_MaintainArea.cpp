@@ -183,7 +183,8 @@ IvPFunction* BHV_MaintainArea::onRunState()
       m_priority_wt=0;
       m_desired_course=m_osh;
     }
-  if(abs((m_desired_course-m_osh>120))||(m_eta>15))
+  double diff=fabs(m_desired_course-m_osh);
+  if((diff>120)||(m_eta>15))
 	 m_turn_required=false;
   ipf = GetCourse(m_desired_course);
   // Part N: Prior to returning the IvP function, apply the priority wt

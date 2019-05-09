@@ -11,6 +11,7 @@
 #include <string>
 #include "IvPBehavior.h"
 #include "ZAIC_PEAK.h"
+#include <math.h>
 
 class BHV_MaintainArea : public IvPBehavior {
 public:

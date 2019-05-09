@@ -34,6 +34,8 @@ BHV_MaintainArea::BHV_MaintainArea(IvPDomain domain) :
   m_osh=0;
   m_eta=0;
   m_desired_course=0;
+  m_first_calc=true;
+  m_turn_required=false;
 }
 
 //---------------------------------------------------------------
@@ -131,23 +133,42 @@ IvPFunction* BHV_MaintainArea::onRunState()
   m_osh=getBufferDoubleVal("NAV_HEADING",ok3);
   m_eta=getBufferDoubleVal("OPREG_TRAJECTORY_PERIM_ETA",ok4);
 
-  if(m_eta<4)
+  if(m_eta<15)
+    m_turn_required=true;
+  if(m_turn_required)
     {
-      m_priority_wt=150;
-      double desired_course=m_osh+180;
-      ipf = GetCourse(desired_course);
-      return(ipf);
+      m_priority_wt=100;
+      if(m_first_calc)
+	{
+	  m_desired_course=m_osh+180;
+	  if(m_desired_course>=360)
+	    m_desired_course=m_desired_course-360;
+	  m_first_calc=false;
+	}
+      
+      ipf = GetCourse(m_desired_course);
+      postMessage("m_osh",m_osh);
+      
+      postMessage("m_desired_course",m_desired_course);
+      
     }
   else
-    m_priority_wt=0;
-  ipf = GetCourse(m_osh);
+    {
+      m_first_calc=true;
+      m_priority_wt=0;
+      m_desired_course=m_osh;
+    }
+  if(abs((m_desired_course-m_osh>90))||(m_eta>15))
+	 m_turn_required=false;
+  ipf = GetCourse(m_desired_course);
   // Part N: Prior to returning the IvP function, apply the priority wt
   // Actual weight applied may be some value different than the configured
   // m_priority_wt, depending on the behavior author's insite.
   if(ipf)
     ipf->setPWT(m_priority_wt);
-
+  
   return(ipf);
+    
 }
 
 IvPFunction* BHV_MaintainArea::GetCourse(double desired_course)

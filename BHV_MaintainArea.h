@@ -38,6 +38,8 @@ protected: // State variables
   double m_osh;
   double m_eta;
   double m_desired_course;
+  bool m_first_calc;
+  bool m_turn_required;
 };
 
 #define IVP_EXPORT_FUNCTION

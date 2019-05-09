@@ -166,6 +166,8 @@ IvPFunction* BHV_MaintainArea::onRunState()
 	    m_desired_course=m_osh+120;
 	  if(m_desired_course>=360)
 	    m_desired_course=m_desired_course-360;
+	  if(m_desired_course<0)
+	    m_desired_course=m_desired_course+360;
 	  m_first_calc=false;
 	}
       

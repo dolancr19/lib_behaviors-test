@@ -148,6 +148,8 @@ IvPFunction* BHV_MaintainArea::onRunState()
           m_east=false;
         }
     }
+  postMessage("east",m_east);
+  postMessage("west",m_west);
   if(m_eta<20)
     m_turn_required=true;
   if(m_turn_required)
@@ -156,16 +158,31 @@ IvPFunction* BHV_MaintainArea::onRunState()
       if(m_first_calc)
 	{
 	  m_heading=m_osh;
-	  if((m_osh>120) && (m_osh<240) && (m_west))
-	    m_desired_course=m_osh-150;
-	  else if((m_osh>120) && (m_osh<240) && (m_east))
-	    m_desired_course=m_osh+150;
-	  else if((m_osh>300) && (m_osh<60) && (m_west))
-	    m_desired_course=m_osh+150;
-	  else if((m_osh>300) && (m_osh<60) && (m_east))
-	    m_desired_course=m_osh-150;
+	  if(((m_osh>120) && (m_osh<240)) && (m_west))
+	    {
+	      m_desired_course=m_osh-150;
+	      postMessage("option","1");
+	    }
+	  else if(((m_osh>120) && (m_osh<240)) && (m_east))
+	    {
+	      m_desired_course=m_osh+150;
+	      postMessage("option","2");
+	    }
+	  else if(((m_osh>300) || (m_osh<60)) && (m_west))
+	    {
+	      m_desired_course=m_osh+150;
+	      postMessage("option","3");
+	    }
+	  else if(((m_osh>300) || (m_osh<60)) && (m_east))
+	    {
+	      m_desired_course=m_osh-150;
+	      postMessage("option","4");
+	    }
 	  else
-	    m_desired_course=m_osh+150;
+	    {
+	      m_desired_course=m_osh+150;
+	      postMessage("option","5");
+	    }
 	  if(m_desired_course>=360)
 	    m_desired_course=m_desired_course-360;
 	  if(m_desired_course<0)

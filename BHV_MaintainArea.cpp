@@ -137,12 +137,12 @@ IvPFunction* BHV_MaintainArea::onRunState()
   m_eta=getBufferDoubleVal("OPREG_TRAJECTORY_PERIM_ETA",ok4);
   if(ok1)
     {
-      if(m_osx>120)
+      if(m_osx>0)
         {
           m_east=true;
           m_west=false;
         }
-      if(m_osx<10)
+      if(m_osx<0)
         {
           m_west=true;
           m_east=false;
@@ -185,12 +185,12 @@ IvPFunction* BHV_MaintainArea::onRunState()
       m_priority_wt=0;
       m_desired_course=m_osh;
     }
-  double turn = abs(((m_heading+360)-(m_osh+360))-360);
+  double turn = fabs(((m_heading+360)-(m_osh+360))-360);
   postMessage("turn",turn);
   if((turn>120)&&(m_eta>20))
 	 m_turn_required=false;
-  if(abs(m_osh-m_desired_course<5))
-     m_turn_required=false;
+  if((fabs(m_osh-m_desired_course))<5)
+  m_turn_required=false;
   
   ipf = GetCourse(m_desired_course);
   // Part N: Prior to returning the IvP function, apply the priority wt

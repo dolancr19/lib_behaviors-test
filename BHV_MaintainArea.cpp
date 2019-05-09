@@ -36,6 +36,8 @@ BHV_MaintainArea::BHV_MaintainArea(IvPDomain domain) :
   m_desired_course=0;
   m_first_calc=true;
   m_turn_required=false;
+  m_west=true;
+  m_east=false;
 }
 
 //---------------------------------------------------------------
@@ -132,7 +134,19 @@ IvPFunction* BHV_MaintainArea::onRunState()
   m_osy=getBufferDoubleVal("NAV_Y",ok2);
   m_osh=getBufferDoubleVal("NAV_HEADING",ok3);
   m_eta=getBufferDoubleVal("OPREG_TRAJECTORY_PERIM_ETA",ok4);
-
+  if(ok1)
+    {
+      if(m_osx>120)
+        {
+          m_east=true;
+          m_west=false;
+        }
+      if(m_osx<10)
+        {
+          m_west=true;
+          m_east=false;
+        }
+    }
   if(m_eta<15)
     m_turn_required=true;
   if(m_turn_required)
@@ -140,7 +154,16 @@ IvPFunction* BHV_MaintainArea::onRunState()
       m_priority_wt=100;
       if(m_first_calc)
 	{
-	  m_desired_course=m_osh+180;
+	  if((m_osh>120) && (m_osh<240) && (m_west))
+	    m_desired_course=m_osh-120;
+	  else if((m_osh>120) && (m_osh<240) && (m_east))
+	    m_desired_course=m_osh+120;
+	  else if((m_osh>300) && (m_osh<60) && (m_west))
+	    m_desired_course=m_osh+120;
+	  else if((m_osh>300) && (m_osh<60) && (m_east))
+	    m_desired_course=m_osh-120;
+	  else
+	    m_desired_course=m_osh+120;
 	  if(m_desired_course>=360)
 	    m_desired_course=m_desired_course-360;
 	  m_first_calc=false;
@@ -158,7 +181,7 @@ IvPFunction* BHV_MaintainArea::onRunState()
       m_priority_wt=0;
       m_desired_course=m_osh;
     }
-  if(abs((m_desired_course-m_osh>90))||(m_eta>15))
+  if(abs((m_desired_course-m_osh>120))||(m_eta>15))
 	 m_turn_required=false;
   ipf = GetCourse(m_desired_course);
   // Part N: Prior to returning the IvP function, apply the priority wt

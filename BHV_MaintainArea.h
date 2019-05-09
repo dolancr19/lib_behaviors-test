@@ -40,6 +40,8 @@ protected: // State variables
   double m_desired_course;
   bool m_first_calc;
   bool m_turn_required;
+  bool m_west;
+  bool m_east;
 };
 
 #define IVP_EXPORT_FUNCTION

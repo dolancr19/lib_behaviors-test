@@ -203,9 +203,9 @@ IvPFunction* BHV_MaintainArea::onRunState()
       m_desired_course=m_osh;
     }
   double turn = fabs(((m_heading+360)-(m_osh+360))-360);
-  postMessage("turn",turn);
-  if((turn>120)&&(m_eta>20))
-	 m_turn_required=false;
+  postMessage("TURN","true");
+  //if((turn>120)&&(m_eta>20))
+  //	 m_turn_required=false;
   if((fabs(m_osh-m_desired_course))<5)
   m_turn_required=false;
   

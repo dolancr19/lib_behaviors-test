@@ -207,7 +207,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
 	  if(m_counter>10)
 	   {
               
-	      if(abs(temp-m_previous_temp<=.20))
+	     if(abs(temp-m_previous_temp)<=5)
                 {
 		  
                   if(m_west)
@@ -238,7 +238,7 @@ IvPFunction* BHV_FrontSearch::onRunState()
 	{
 	  if(m_counter>10)
 	    {
-	      if(abs(temp-m_previous_temp<=.2))
+	      if(abs(temp-m_previous_temp)<=5)
                 {
                   //m_desired_course=180;
 		  if(m_west)
